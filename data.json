@@ -1,0 +1,88 @@
+{
+  "profile": {
+    "firstName": "Alex",
+    "lastName": "Ruco",
+    "title": "O Seu Consultor Imobiliário",
+    "company": "Century21 Investment",
+    "bio": "Sempre ao seu lado.",
+    "photoInitials": "AR",
+    "photoUrl": "assets/profile.jpeg",
+    "address": "Lousã, Portugal",
+    "website": "https://casa.ruco.pt",
+    "phone": "+351927734057",
+    "phoneDisplay": "+351 927 734 057",
+    "email": "alexandre-ruco@century21.pt"
+  },
+  "ui": {
+    "pageTitle": "{name} — Cartão Digital",
+    "pageDescription": "Cartão de visita digital",
+    "qrAlt": "QR code do cartão",
+    "sharePrompt": "Aponta a câmara para",
+    "shareEmphasis": "partilhar este cartão",
+    "shareSuffix": "com outra pessoa."
+  },
+  "palette": {
+    "bg": "#0f1b2b",
+    "bg2": "#16273c",
+    "paper": "#eee8db",
+    "textDim": "#9fb0c4",
+    "textDim2": "#cdd6e2",
+    "accent": "#c8a24a",
+    "accentDim": "#c8a24a55",
+    "line": "#3a4b62"
+  },
+  "video": {
+    "enabled": false,
+    "type": "file",
+    "url": "",
+    "poster": "",
+    "caption": ""
+  },
+  "actions": [
+    {
+      "label": "Guardar Contacto (.vcf)",
+      "icon": "fa-solid fa-user-plus",
+      "type": "vcard",
+      "primary": true
+    },
+    {
+      "label": "+351 927 734 057",
+      "icon": "fa-solid fa-phone",
+      "type": "tel",
+      "value": "+351927734057"
+    },
+    {
+      "label": "alexandre-ruco@century21.pt",
+      "icon": "fa-solid fa-envelope",
+      "type": "email",
+      "value": "alexandre-ruco@century21.pt"
+    }
+  ],
+  "socials": [
+    {
+      "label": "LinkedIn",
+      "icon": "fa-brands fa-linkedin-in",
+      "url": "https://linkedin.com/in/alexandreruco"
+    },
+    {
+      "label": "Instagram",
+      "icon": "fa-brands fa-instagram",
+      "url": "https://instagram.com/casa.ruco.pt"
+    },
+    {
+      "label": "Facebook",
+      "icon": "fa-brands fa-facebook-f",
+      "url": "https://www.facebook.com/alexandrerucoC21"
+    },
+    {
+      "label": "WhatsApp",
+      "icon": "fa-brands fa-whatsapp",
+      "url": "https://wa.me/351927734057"
+    },
+    {
+      "label": "Home",
+      "icon": "fa-solid fa-house",
+      "url": "https://alex-ruco/century21.pt"
+    }
+  ]
+}
