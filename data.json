@@ -14,12 +14,16 @@
     "email": "alexandre-ruco@century21.pt"
   },
   "ui": {
-    "pageTitle": "{name} — Cartão Digital",
-    "pageDescription": "Cartão de visita digital",
+    "pageTitle": "{name}",
+    "pageDescription": "Alex Ruco: O Seu Consultor Imobiliário / Century21 Investment & Lousã, Portugal",
+    "language": "pt-PT",
+    "canonicalUrl": "https://casa.ruco.pt/",
     "qrAlt": "QR code do cartão",
     "sharePrompt": "Aponta a câmara para",
-    "shareEmphasis": "visualizar esta página",
-    "shareSuffix": "com o seu smartphone."
+    "shareEmphasis": "partilhar este cartão",
+    "shareSuffix": "com outra pessoa.",
+    "socialImage": "assets/og-image.png",
+    "portraitShareImage": "assets/share-image-portrait.png"
   },
   "palette": {
     "bg": "#0f1b2b",
@@ -82,7 +86,7 @@
     {
       "label": "Home",
       "icon": "fa-solid fa-house",
-      "url": "https://alex-ruco.century21.pt"
+      "url": "https://alex-ruco/century21.pt"
     }
   ]
 }
