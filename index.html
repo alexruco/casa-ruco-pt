@@ -3,22 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alex Ruco</title>
-<meta name="description" content="Alex Ruco: O Seu Consultor Imobiliário / Century21 Investment &amp; Lousã, Portugal">
-<meta property="og:type" content="profile">
-<meta property="og:title" content="Alex Ruco">
-<meta property="og:description" content="Alex Ruco: O Seu Consultor Imobiliário / Century21 Investment &amp; Lousã, Portugal">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://casa.ruco.pt/">
-<meta property="og:url" content="https://casa.ruco.pt/">
-<meta property="og:image" content="https://casa.ruco.pt/assets/og-image.png">
-<meta property="og:image:type" content="image/png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Cartão digital de Alex Ruco">
-<meta name="twitter:image" content="https://casa.ruco.pt/assets/og-image.png">
-<meta name="twitter:image:alt" content="Cartão digital de Alex Ruco">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Alex Ruco","jobTitle":"O Seu Consultor Imobiliário","worksFor":{"@type":"Organization","name":"Century21 Investment"},"url":"https://casa.ruco.pt","image":"https://casa.ruco.pt/assets/profile.jpeg","email":"alexandre-ruco@century21.pt","telephone":"+351927734057","address":{"@type":"PostalAddress","addressLocality":"Lousã, Portugal"},"sameAs":["https://linkedin.com/in/alexandreruco","https://instagram.com/casa.ruco.pt","https://www.facebook.com/alexandrerucoC21","https://wa.me/351927734057","https://alex-ruco/century21.pt"]}</script>
+<title>Alex Ruco</title><meta name="description" content="Alex Ruco: O Seu Consultor Imobiliário / Century21 Investment &amp; Lousã, Portugal"><link rel="canonical" href="https://casa.ruco.pt/"><meta property="og:type" content="profile"><meta property="og:title" content="Alex Ruco"><meta property="og:description" content="Alex Ruco: O Seu Consultor Imobiliário / Century21 Investment &amp; Lousã, Portugal"><meta property="og:url" content="https://casa.ruco.pt/"><meta property="og:image" content="https://casa.ruco.pt/assets/og-image-d884191cd1aa65df.png"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Cartão digital de Alex Ruco"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Alex Ruco"><meta name="twitter:description" content="Alex Ruco: O Seu Consultor Imobiliário / Century21 Investment &amp; Lousã, Portugal"><meta name="twitter:image" content="https://casa.ruco.pt/assets/og-image-d884191cd1aa65df.png"><meta name="twitter:image:alt" content="Cartão digital de Alex Ruco"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Alex Ruco","jobTitle":"O Seu Consultor Imobiliário","worksFor":{"@type":"Organization","name":"Century21 Investment"},"url":"https://casa.ruco.pt","image":"https://casa.ruco.pt/assets/profile.jpeg","email":"alexandre-ruco@century21.pt","telephone":"+351927734057","address":{"@type":"PostalAddress","addressLocality":"Lousã, Portugal"},"sameAs":["https://linkedin.com/in/alexandreruco","https://instagram.com/casa.ruco.pt","https://www.facebook.com/alexandrerucoC21","https://wa.me/351927734057","https://alex-ruco/century21.pt"]}</script>
 
 <!-- Font Awesome (ícones gratuitos, via CDN) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -190,7 +175,7 @@ async function init(){
     if(a.type === "vcard") return vcardUrl;
     if(a.type === "tel") return `tel:${a.value}`;
     if(a.type === "email") return `mailto:${a.value}`;
-    return a.url || a.value || "#";
+    return a.trackingUrl || a.url || a.value || "#";
   }
 
   function renderActions(items){
@@ -207,7 +192,7 @@ async function init(){
   const primaryActionsHtml = renderActions(enabledActions.filter(a => a.primary));
 
   const socialsHtml = (socials || []).filter(s => s.enabled !== false).map(s => `
-    <a href="${s.url}" target="_blank" rel="noopener" title="${s.label}">
+    <a href="${s.trackingUrl || s.url}" target="_blank" rel="noopener" title="${s.label}">
       <i class="${s.icon}"></i>
     </a>`).join("");
 
@@ -225,7 +210,8 @@ async function init(){
   }
 
   const pageUrl = ui.canonicalUrl || window.location.href.split("#")[0].replace(/index\.html?$/, "");
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(pageUrl)}`;
+  const qrTarget = ui.qrPageUrl || pageUrl;
+  const qrSrc = ui.pageQrCodeDataUrl || `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTarget)}`;
 
   app.innerHTML = `
     <div class="card">
