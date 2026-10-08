@@ -1,0 +1,320 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Script de Prospecção</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: coluna única pensada para o telemóvel, fluxo vertical
+     Abertura -> Objeção (escolha) -> Resposta, ligado por uma linha à esquerda. */
+  :root {
+    /* Cores (tema claro) */
+    --bg: #f3f4f6;          /* fundo, cinza frio */
+    --surface: #ffffff;     /* cartões */
+    --fg: #14171c;          /* texto principal */
+    --muted: #5a6270;       /* texto secundário */
+    --line: #d5d9e0;        /* bordas e conector */
+    --accent: #8a6a14;      /* dourado escuro, texto sobre fundo claro */
+    --accent-bg: #f3e7c2;   /* dourado suave, fundo de destaque */
+    --accent-solid: #c9a227;/* dourado de preenchimento */
+    --on-solid: #14171c;    /* texto sobre o dourado */
+    --end: #7a2e2e;         /* tom do encerramento */
+    --end-bg: #f4dede;
+
+    /* Tipografia */
+    --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+    --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101216; --surface: #1a1d23; --fg: #eceef2; --muted: #9aa3b2;
+      --line: #2e333c; --accent: #e3c25a; --accent-bg: #3a3118;
+      --accent-solid: #d4af37; --on-solid: #14171c;
+      --end: #f0a9a9; --end-bg: #3a2020; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101216; --surface: #1a1d23; --fg: #eceef2; --muted: #9aa3b2;
+    --line: #2e333c; --accent: #e3c25a; --accent-bg: #3a3118;
+    --accent-solid: #d4af37; --on-solid: #14171c;
+    --end: #f0a9a9; --end-bg: #3a2020; color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    padding-inline: 16px;   /* gutter lateral fixo */
+    padding-block: 20px 48px;
+  }
+  .wrap { max-width: 640px; margin-inline: auto; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: 1.5rem; line-height: 1.15; margin: 0 0 4px;
+    text-wrap: balance;
+  }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: .9rem; }
+
+  .label {
+    font-size: .72rem; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* Dados da chamada (nome, imóvel, agência) */
+  details.fields {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 20px;
+  }
+  details.fields summary {
+    cursor: pointer; font-weight: 600; font-size: .95rem; list-style: none;
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  details.fields summary::-webkit-details-marker { display: none; }
+  details.fields summary span { color: var(--muted); font-weight: 400; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .field-grid { display: grid; gap: 12px; margin-top: 14px; }
+  .field-grid label { display: grid; gap: 4px; font-size: .8rem; color: var(--muted); }
+  .field-grid input {
+    font: inherit; font-size: 1rem; color: var(--fg); background: var(--bg);
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0;
+  }
+
+  /* Fluxo: conector vertical à esquerda dos nós */
+  .flow { position: relative; display: grid; gap: 16px; padding-left: 28px; }
+  .flow::before {
+    content: ""; position: absolute; left: 9px; top: 12px; bottom: 12px;
+    width: 2px; background: var(--line);
+  }
+  .node { position: relative; min-width: 0; }
+  .node::before { /* ponto de ligação */
+    content: ""; position: absolute; left: -26px; top: 18px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--accent-solid);
+  }
+  .node.on::before { background: var(--accent-solid); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px;
+  }
+  .say {
+    font-size: 1.15rem; line-height: 1.55; margin: 8px 0 0;
+  }
+
+  /* Botões de objeção */
+  .choices { display: grid; gap: 8px; margin-top: 8px; }
+  .choice {
+    appearance: none; text-align: left; font: inherit; font-weight: 500;
+    color: var(--fg); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px; min-height: 52px; cursor: pointer;
+    display: flex; gap: 12px; align-items: center; width: 100%;
+  }
+  .choice .n {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    display: grid; place-items: center; font-size: .8rem; font-weight: 600;
+    background: var(--accent-bg); color: var(--accent);
+  }
+  .choice:hover { border-color: var(--accent-solid); }
+  .choice:focus-visible { outline: 3px solid var(--accent-solid); outline-offset: 2px; }
+  .choice[aria-pressed="true"] {
+    background: var(--accent-solid); color: var(--on-solid); border-color: var(--accent-solid);
+  }
+  .choice[aria-pressed="true"] .n { background: var(--on-solid); color: var(--accent-solid); }
+  .choice.end .n { background: var(--end-bg); color: var(--end); }
+  .choice.end[aria-pressed="true"] { background: var(--end); border-color: var(--end); color: #fff; }
+  .choice.end[aria-pressed="true"] .n { background: #fff; color: var(--end); }
+
+  /* Resposta */
+  .answer { border-color: var(--accent-solid); border-width: 2px; }
+  .answer.end { border-color: var(--end); }
+  .goal {
+    display: inline-block; margin-top: 14px; padding: 4px 10px; border-radius: 999px;
+    font-size: .8rem; font-weight: 600; background: var(--accent-bg); color: var(--accent);
+  }
+  .answer.end .goal { background: var(--end-bg); color: var(--end); }
+  .empty { color: var(--muted); margin: 0; }
+
+  /* Lista de perguntas de qualificação */
+  .qs { margin: 8px 0 0; padding-left: 22px; font-size: 1.15rem; line-height: 1.5; }
+  .qs li { padding-left: 4px; }
+  .qs li + li { margin-top: 10px; }
+
+  button.reset {
+    font: inherit; font-size: .85rem; color: var(--muted); background: none;
+    border: none; padding: 8px 0 0; cursor: pointer; text-decoration: underline;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .answer { animation: in .15s ease-out; }
+    @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="wrap">
+  <h1>Script de Prospecção</h1>
+  <p class="sub">Chamada a proprietários com anúncio. Escolha a objeção e leia a resposta.</p>
+
+  <!-- Dados que personalizam o texto; campos vazios usam uma redação neutra -->
+  <details class="fields" id="fields">
+    <summary>Dados da chamada <span id="fields-sum"></span></summary>
+    <div class="field-grid">
+      <label for="f-nome">Nome do cliente
+        <input id="f-nome" type="text" autocomplete="off" placeholder="ex.: António">
+      </label>
+      <label for="f-imovel">Imóvel (com artigo)
+        <input id="f-imovel" type="text" autocomplete="off" placeholder="ex.: a moradia em Serpins">
+      </label>
+      <label for="f-agencia">Agência ou agente atual (se souber)
+        <input id="f-agencia" type="text" autocomplete="off" placeholder="ex.: a agência X">
+      </label>
+    </div>
+  </details>
+
+  <div class="flow">
+    <!-- Nó 1: abertura -->
+    <section class="node on">
+      <div class="card">
+        <div class="label">1 · Abertura</div>
+        <p class="say" id="opening"></p>
+      </div>
+    </section>
+
+    <!-- Nó 2: perguntas de qualificação, feitas por ordem -->
+    <section class="node on">
+      <div class="card">
+        <div class="label">2 · Pergunte</div>
+        <ol class="qs">
+          <li>É o proprietário ou é consultor?</li>
+          <li>Está a trabalhar com alguma agência, ou a vender em particular?</li>
+          <li>Haveria abertura para me receber como consultor, para eu poder apresentar o imóvel aos meus clientes? Ou está fechado a consultores por alguma razão?</li>
+        </ol>
+        <span class="goal">Deixe-o desabafar sem interromper</span>
+      </div>
+    </section>
+
+    <!-- Nó 3: escolha da objeção -->
+    <section class="node">
+      <div class="label">3 · O motivo que ele der</div>
+      <div class="choices" id="choices"></div>
+    </section>
+
+    <!-- Nó 3: resposta -->
+    <section class="node" id="answer-node">
+      <div id="answer"></div>
+    </section>
+  </div>
+</div>
+
+<script>
+  // Conteúdo do script. Marcadores: {,nome} -> ", Nome" (ou nada), {imovel}, {agencia}.
+  const OBJECTIONS = [
+    { key: "o1", label: "Não procuro representação", goal: "Agendar visita sem compromisso",
+      text: "Percebo perfeitamente{,nome}, obrigado pela franqueza! Mesmo assim, gostava de conhecer {imovel}. A zona é ótima e, à partida, o preço parece-me bem ajustado. Pode ter um bom encaixe com alguns dos compradores que acompanhamos. Podemos combinar uma visita sem compromisso?" },
+    { key: "o2", label: "Já tenho agente / agência", goal: "Propor partilha de negócio",
+      text: "Perfeito{,nome}, obrigado por avisar! Não quero atrapalhar o trabalho de ninguém. Se fizer sentido para si e para a agência, trabalhamos em partilha: se um dos nossos compradores se interessar por {imovel}, falamos primeiro consigo e depois com o vosso consultor. Pode ser?" },
+    { key: "o3", label: "Estou a vender por conta própria", goal: "Apresentar comprador e visitar",
+      text: "Compreendo perfeitamente{,nome}, e acho bem que tente. Entretanto, se tiver algum comprador a acompanhar {imovel}, gostava de lho apresentar, sem qualquer compromisso e sem custos para si. Quando lhe der jeito, passo aí para conhecer o imóvel?" },
+    { key: "o4", label: "Não quero pagar comissão", goal: "Explicar modelo de valor e agendar",
+      text: "Compreendo{,nome}, e é exatamente por isso que trabalho de outra forma. Primeiro, quero perceber qual é o valor que gostava de receber por {imovel}. Se esse valor, somado à minha comissão, estiver ao preço de mercado, faço tudo para que seja respeitado e atingido. Não espero que a comissão saia do seu bolso: é valor acrescentado ao preço que o comprador paga. Se os números não encaixarem, digo-lhe com franqueza antes de avançarmos. Podemos combinar uma visita sem compromisso?" },
+    { key: "o5", label: "Não quero exclusividade", goal: "Enfatizar partilha 50/50",
+      text: "Percebo{,nome}, e não lhe peço exclusividade. Trabalho sempre em partilha 50/50 com outras agências, porque prestar um bom serviço aos clientes que represento vem sempre em primeiro lugar. Se aparecer um comprador para {imovel}, avançamos em conjunto com {agencia}, sem custos adicionais para si. Pode ser?" },
+    { key: "end", label: "Não me contacte mais / Sem interesse", goal: "Terminar com elegância e cordialidade", end: true,
+      text: "Entendido{,nome}. Obrigado pelo seu tempo e desculpe o incómodo. Boa continuação." }
+  ];
+  const OPENING = "{saudacao}{,nome}. Aqui é o Alex, da Century 21. Vi o seu anúncio sobre {imovel} e queria fazer-lhe umas perguntas rápidas.";
+
+  const $ = (id) => document.getElementById(id);
+  const inputs = { nome: $("f-nome"), imovel: $("f-imovel"), agencia: $("f-agencia") };
+  let selected = null;
+
+  // Substitui os marcadores; vazio -> redação neutra, sem sobras de marcador
+  function fill(tpl) {
+    const nome = inputs.nome.value.trim();
+    const imovel = inputs.imovel.value.trim() || "o imóvel";
+    const agencia = inputs.agencia.value.trim() || "a agência atual";
+    const saudacao = new Date().getHours() < 13 ? "Bom dia" : "Boa tarde";
+    return tpl
+      .replace("{saudacao}", saudacao)
+      .replace("{,nome}", nome ? ", " + nome : "")
+      .replace(/\{imovel\}/g, imovel)
+      .replace("{agencia}", agencia);
+  }
+
+  // Desenha a resposta da objeção escolhida (só essa)
+  function renderAnswer() {
+    const box = $("answer");
+    box.textContent = "";
+    const o = OBJECTIONS.find((x) => x.key === selected);
+    const card = document.createElement("div");
+    if (!o) {
+      card.className = "card";
+      const p = document.createElement("p");
+      p.className = "empty";
+      p.textContent = "A resposta aparece aqui.";
+      card.append(p);
+    } else {
+      card.className = "card answer" + (o.end ? " end" : "");
+      const l = document.createElement("div");
+      l.className = "label";
+      l.textContent = "Responda";
+      const p = document.createElement("p");
+      p.className = "say";
+      p.textContent = fill(o.text);
+      const g = document.createElement("span");
+      g.className = "goal";
+      g.textContent = "Objetivo: " + o.goal;
+      card.append(l, p, g);
+    }
+    box.append(card);
+    $("answer-node").classList.toggle("on", !!o);
+  }
+
+  function renderChoices() {
+    const wrap = $("choices");
+    wrap.textContent = "";
+    OBJECTIONS.forEach((o, i) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "choice" + (o.end ? " end" : "");
+      b.setAttribute("aria-pressed", String(o.key === selected));
+      const n = document.createElement("span");
+      n.className = "n";
+      n.textContent = o.end ? "×" : String(i + 1);
+      const t = document.createElement("span");
+      t.textContent = o.label;
+      b.append(n, t);
+      b.addEventListener("click", () => {
+        // Tocar de novo na mesma objeção limpa a resposta
+        selected = selected === o.key ? null : o.key;
+        renderChoices();
+        renderAnswer();
+        if (selected) $("answer-node").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+      wrap.append(b);
+    });
+  }
+
+  function refresh() {
+    $("opening").textContent = fill(OPENING);
+    const s = [inputs.nome.value.trim(), inputs.imovel.value.trim()].filter(Boolean).join(" · ");
+    $("fields-sum").textContent = s;
+    renderAnswer();
+    // Guarda os dados só como conveniência local (pode falhar)
+    try { localStorage.setItem("prospeccao", JSON.stringify({
+      nome: inputs.nome.value, imovel: inputs.imovel.value, agencia: inputs.agencia.value })); } catch (e) {}
+  }
+
+  // Recupera os dados guardados, se existirem
+  try {
+    const saved = JSON.parse(localStorage.getItem("prospeccao") || "{}");
+    for (const k in inputs) if (saved[k]) inputs[k].value = saved[k];
+  } catch (e) {}
+
+  Object.values(inputs).forEach((el) => el.addEventListener("input", refresh));
+  renderChoices();
+  refresh();
+</script>
+
+</body></html>
